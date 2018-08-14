@@ -81,7 +81,7 @@ class SpeedThread: public Thread {
     // if we divide by 10 we get 20 - 100 ms wait which seems about right
     // divide by constant factor with min and max
     // min shld probs be about 10ms, max should probs be abt 100-200ms
-    long adjusted = (millisecs / 15);
+    long adjusted = (millisecs / 5);
     if (adjusted < 10) {
       return 10;
     }
