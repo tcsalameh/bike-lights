@@ -30,8 +30,8 @@ I also wanted to be able to easily detach the whole system from my bike, in abou
 1. First, I wired up and got the whole system working without trying to put anything other than the light strip on the bike. Only after I was satisfied that the code/hardware actually worked, did I think about how it was going to get attached.
 2. Then, I took the water bottle storage container and drilled 3 holes - one just above where the cage would end for the toggle switch, and two in the bottom of the container (for cables for the light strip and the hall sensor).
 3. Then, I broke out the soldering iron and started with where the 4 wire cables would end: at the light strip and at the sensor.
-  - Soldered the 4 wires to power, data, ground, and ground wires from the LED strip.
-  - For the other one, cut off one wire and soldered the remaining to power, data, and ground wires of the hall sensor.
+      - Soldered the 4 wires to power, data, ground, and ground wires from the LED strip. I lost the threaded connector for the cable during this process.
+      - For the other one, cut off one wire and soldered the remaining to power, data, and ground wires of the hall sensor.
 4. Then, I started from the other end and connected the power supply to the toggle switch, and soldered wires going into and out of the switch.
 5. At this point I really wanted to be sure that everything was right, because once I soldered any of the 7 wires from the cables to the Arduino or output of the switch, I wouldn't be able to dissasemble anything without de-soldering most of it.
 6. Finally, I soldered all the remaining connections, which was a bit tricky since everything was half in the container. Since the power/ground wires going to the Arduino were so close, I put some glue in between them after soldering the wires to the header pins, as insulation.
