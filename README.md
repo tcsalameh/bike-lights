@@ -1,6 +1,6 @@
 ## Speed-sensitive bike lights
 
-![video](videos/bike_light_video.mov)
+[![video](http://img.youtube.com/vi/7HX3JH0OVps/0.jpg)](https://www.youtube.com/watch?v=7HX3JH0OVps)
 
 This is a fun project I did to create side-mounted lights for my bike that would react to different speeds.
 The basic idea is a LED light strip that goes up the downtube, around the headtube, and back down again, secured with adhesive velcro strips, a hall sensor chip and magnet to detect the speed of the wheel, and a microcontroller + power supply inside a water bottle to coordinate the whole thing.
