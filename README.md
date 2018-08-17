@@ -1,5 +1,7 @@
 ## Speed-sensitive bike lights
 
+![video](videos/bike_light_video.mov)
+
 This is a fun project I did to create side-mounted lights for my bike that would react to different speeds.
 The basic idea is a LED light strip that goes up the downtube, around the headtube, and back down again, secured with adhesive velcro strips, a hall sensor chip and magnet to detect the speed of the wheel, and a microcontroller + power supply inside a water bottle to coordinate the whole thing.
 I also wanted to be able to easily detach the whole system from my bike, in about 5 minutes or less. Sometimes I lock up the bike outside, or ride it in poor weather, and I didn't want the thing to get stolen or destroyed. So, the light strip and sensor are secured with velcro, and easy to detach from the microcontroller and power supply. It doesn't really fit easily into a backpack without risk of damage, though.
