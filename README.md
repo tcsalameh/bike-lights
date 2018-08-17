@@ -39,3 +39,13 @@ I also wanted to be able to easily detach the whole system from my bike, in abou
 8. Finally, I worked on mounting the sensor to the back left chainstay, near the wheel. I used a small piece of an adhesive velcro strip to attach it, and found that I needed to put some padding on the back of the sensor to get it close enough to the wheel. Using adhesive wall hanging strips added about 10-20 millimeters, more than enough. I forgot to put plastic over the sensor before attaching the Velcro, so it's just exposed (and I'll probably need to replace it after a bit). Strategically placed velcro ties keep all the cables from straying too far from the frame.
 
 ## More Pictures and Videos
+
+![bike](pictures/whole_bike_off.jpg)
+![led_velcro](pictures/light_strip_velcro_closeup.jpg)
+![downtube_bb](pictures/downtube_and_bottom_bracket.jpg)
+![cable_closeup](pictures/cable_closeup.jpg)
+![cable_and_container_closeup](pictures/cable_and_container_closeup.jpg)
+![switch_closeup](pictures/switch_closeup.jpg)
+![sensor_closeup](pictures/sensor_closeup.jpg)
+![open_container](pictures/battery_in_container.jpg)
+![open_container_no_battery](pictures/rest_of_container.jpg)
