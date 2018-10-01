@@ -4,9 +4,11 @@
 
 #include <Adafruit_NeoPixel.h>
 
-#define PIXEL_PIN 6
-#define SENSOR_PIN 8
-#define STRIP_SIZE 68
+#define PIXEL_PIN         6
+#define SENSOR_PIN        8
+#define STRIP_SIZE        68
+#define MAX_ROTATION_TIME 255    /* Above this we consider the bike stopped. */
+#define MIN_ROTATION_TIME 15     /* Below this we stop trying to update the animation. */
 
 class PixelThread: public Thread {
   public:
@@ -27,15 +29,13 @@ class PixelThread: public Thread {
 
     uint32_t rateToColor(uint16_t rate) {
       // red for low speeds, brighter and bluer/whiter as we go faster
-      // max rate is 200 (lowest), min rate is 10
       // should spend some time looking at examples, thinking about this
-      if (rate < 15) {
-        rate = 15;
+      if (rate < MIN_ROTATION_TIME) {
+        rate = MIN_ROTATION_TIME;
       }
-      uint8_t r;
-      uint8_t g;
-      uint8_t b;
-      if (rate >= 255) {
+      uint8_t r, g, b;
+
+      if (rate >= MAX_ROTATION_TIME) {
         r = 255;
         g, b = 0;
       } else {
@@ -117,11 +117,26 @@ void speedCallback() {
 
 void lightStripCallback() {
   uint16_t n = strip.numPixels();
+  uint32_t c = pt.rateToColor(st.rate);
+
+  if (st.rate >= 300) {
+    for (uint16_t i=0; i < n; i++) {
+      if (strip.getPixelColor(i) == 0) {
+        strip.setPixelColor(i, pt.rateToColor(st.rate));
+      } else {
+        strip.setPixelColor(i, 0);
+      }
+    }
+
+    strip.show();
+    return;
+  }
+
   if (pt.index > 0) {
     strip.setPixelColor(pt.index-1, 0);
     strip.setPixelColor(n - pt.index, 0);
   }
-  uint32_t c = pt.rateToColor(st.rate);
+
   for (uint16_t j=pt.index; j<(pt.index + pt.pix_per_run); j++) {
     strip.setPixelColor(j, c);
   }
@@ -140,16 +155,17 @@ void lightStripCallback() {
     pt.index = 0;
   }
   strip.show();
-  
+
   pt.setInterval(st.rate);
 }
+
 
 
 void setup() {
   pinMode(SENSOR_PIN, INPUT);
   strip.begin();
   strip.show();
-  
+
   pt.onRun(lightStripCallback);
   pt.setInterval(50);
 
