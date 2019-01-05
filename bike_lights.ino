@@ -4,9 +4,36 @@
 
 #include <Adafruit_NeoPixel.h>
 
-#define PIXEL_PIN 6
-#define SENSOR_PIN 8
-#define STRIP_SIZE 68
+#define PIXEL_PIN    6
+#define SENSOR_PIN   8
+#define STRIP_SIZE   68
+#define PIX_PER_RUN  3
+
+#define COLOR_SPEED_MIN  75
+#define COLOR_SPEED_MAX  1275
+
+#define R_COLOR_MIN      255
+#define G_COLOR_MIN      0
+#define B_COLOR_MIN      0
+#define R_COLOR_MAX      0
+#define G_COLOR_MAX      255
+#define B_COLOR_MAX      100
+#define R_RANGE          abs(R_COLOR_MAX - R_COLOR_MIN)
+#define G_RANGE          abs(G_COLOR_MAX - G_COLOR_MIN)
+#define B_RANGE          abs(B_COLOR_MAX - B_COLOR_MIN)
+
+#define RATE_SPEED_MIN   51
+#define RATE_SPEED_MAX   2000
+#define RATE_MIN         10
+#define RATE_MAX         400
+#define RATE_RANGE       RATE_MAX - RATE_MIN
+
+#define STOPPED          1275
+#define R_STOPPED        255
+#define G_STOPPED        0
+#define B_STOPPED        0
+#define STOPPED_RATE     400
+
 
 class PixelThread: public Thread {
   public:
@@ -23,6 +50,25 @@ class PixelThread: public Thread {
       pix_per_run = _pix_per_run;
       index = 0;
       color = strip.Color(255, 0, 0);
+    }
+
+    uint32_t calculateColor(long speed) {
+      double pctg;
+
+      if (speed <= STOPPED)
+        return strip.Color(R_STOPPED, G_STOPPED, B_STOPPED);
+
+      pctg = (speed - COLOR_SPEED_MIN) / (double) (COLOR_SPEED_MAX - COLOR_SPEED_MIN);
+      if (pctg < 0)
+        pctg = 0.0;
+      if (pctg > 1)
+        pctg = 1.0;
+
+      return strip.Color(
+          R_COLOR_MIN + (uint8_t) (pctg * R_RANGE),
+          G_COLOR_MIN + (uint8_t) (pctg * G_RANGE),
+          B_COLOR_MIN + (uint8_t) (pctg * B_RANGE),
+        )
     }
 
     uint32_t rateToColor(uint16_t rate) {
@@ -50,6 +96,7 @@ class PixelThread: public Thread {
 class SpeedThread: public Thread {
   public:
     uint16_t rate;
+    long speed;
 
     long _timeOfLastHit;
     long _timeSinceLastRotation;
@@ -57,6 +104,7 @@ class SpeedThread: public Thread {
 
   SpeedThread() {
     rate = 300;
+    speed = 0;
     _timeSinceLastRotation = 5000;
     _timeOfLastHit = 0;
     _reset = false;
@@ -72,6 +120,21 @@ class SpeedThread: public Thread {
       _timeOfLastHit = millis();
       _reset = true;
     }
+  }
+
+  uint16_t calculateRate() {
+    double pctg;
+
+    if (speed <= STOPPED)
+      return STOPPED_RATE;
+
+    pctg = (speed - RATE_SPEED_MIN) / (double) (RATE_SPEED_MAX - RATE_SPEED_MIN);
+    if (pctg < 0)
+      pctg = 0.0;
+    if (pctg > 1)
+      pctg = 1.0;
+
+    return RATE_MIN + (uint16_t) (pctg * RATE_RANGE);
   }
 
   uint16_t timeToRate(long millisecs) {
@@ -92,7 +155,8 @@ class SpeedThread: public Thread {
   }
 
   void setRate() {
-    rate = timeToRate(max(_timeSinceLastRotation, millis() - _timeOfLastHit));
+    speed = max(_timeSinceLastRotation, millis() - _timeOfLastHit);
+    rate = calculateRate();
   }
 };
 
@@ -106,7 +170,7 @@ class SpeedThread: public Thread {
 //   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(STRIP_SIZE, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
-PixelThread pt = PixelThread(strip, 3);
+PixelThread pt = PixelThread(strip, PIX_PER_RUN);
 SpeedThread st = SpeedThread();
 
 ThreadController controller = ThreadController();
@@ -121,7 +185,7 @@ void lightStripCallback() {
     strip.setPixelColor(pt.index-1, 0);
     strip.setPixelColor(n - pt.index, 0);
   }
-  uint32_t c = pt.rateToColor(st.rate);
+  uint32_t c = pt.calculateColor(st.speed);
   for (uint16_t j=pt.index; j<(pt.index + pt.pix_per_run); j++) {
     strip.setPixelColor(j, c);
   }
