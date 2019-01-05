@@ -1,0 +1,135 @@
+## Form Factor
+
+- Instead of putting velcro on the bike, attach adjustable velcro straps along the light strip and on the cables.
+- Form factor for battery pack and computer
+  -> 3d printed container that sits underneath bb or just on top of downtube
+  -> how large does the battery need to be?
+  -> how small of a form factor can I get the Arduino in that will still be viable?
+- Wireless communication
+  -> Wifi chip so you can update the code without having to plug in
+    -> Alternatively, just better exposing the port on the Arduino is probably good enough
+  -> Communication between sensor and arduino would be nice if doable without cables
+    -> can I use an off the shelf wireless sensor and figure out how to talk to it? this would be ideal.
+
+## Code
+
+- Fewer magic values and hardcoded patterns
+- A translation layer that allows for several styles of custom patterns
+  -> Select from several types when moving:
+    -> caterpillar: lights move up or down downtube to headtube and back. n at a time at a rate determined by speed.
+        -> config values:
+            -> number of points in the caterpillar at a time. from 1 - ??.
+            -> color speed range. this is the range of speeds that it will vary colors over. outside of range will just be stuck at max or min.
+            -> start color, this is the color at the minimum speed and below.
+            -> 0 to n midpoint colors, these are colors at step speeds. will try to infer smooth transition but no guarantees.
+            -> end color, this is the color at max speed and above.
+            -> rate speed range. this is the range of speeds that it will vary transition rates over. outside of range will just stick to max or min.
+            -> start rate, this is the transition rate at minimum speed and below.
+            -> end rate, this is the transition rate at max speed and above.
+            -> bonus: an inversion button for each range that will invert the order of everything.
+  -> Behavior when stopped is configured independently:
+    -> caterpillar, with one color and speed you pick
+    -> entire strip flashing, pick up to n colors to flash through and rate
+- what do I need to make a translation layer work?
+  -> basically this is some kind of interpreted front end (probs js) building a config, then we build C++ code from that config to load into the Arduino
+  -> you need a way to variably set the number of points in the caterpillar. this one's actually pretty easy.
+  -> you need a way to set the min and max speeds for which colors will be recognized.
+  -> you need a way to set min and max speeds where rates will be recognized.
+  -> a function that takes two pairs of (color, speed), and calculates a smooth gradient of colors between them
+  -> a function that takes two pairs of (rate, speed), and calculates a smooth gradient of rates between them
+
+  -> ultimately you have a function that takes a speed and spits out a color to make the things
+  -> and a function that takes a speed and spits out at what rate the caterpillar should move
+  -> question: given two (color, speed) pairs where speed1 < speed2, can I devise a function f(speed) that will spit out a color on a gradient between color1 and color2 corresponding to where speed lies between speed1 and speed2?
+  -> Yes - basic example:
+      -> we find the units between speed1 and speed2, suppose speed2 - speed1 = 100.
+      -> on each RGB dimension, we find difference between color2 and color1. suppose color2r - color1r = 50, color2g - color1g = 100, color2b - color1b = 0.
+      -> given speed s, our function finds (s - speed1) / (speed2 - speed1). if s is 60 we get 0.6, call this p.
+      -> if p < 0 we coerce p to 0, if p > 1 we coerce it to 1.
+      -> then for each RGB dimension, we find color1d + p * diff. e.g. r = color1r + 0.6 * 50, g = color1g + 0.6 * 100, b = color1b + 0.6 * 0
+  -> Next: given two (rate, speed) pairs, function to get a rate on a gradient between rate1 and rate2 corresponding to speed?
+      -> find units b/t speed1 and speed2, suppose speed2 - speed1 = 100
+      -> find diffs in rate, suppose rate2 - rate1 = 20
+      -> given speed s, get (s - speed1) / (speed2 - speed1), call it p. supposed p = 0.6.
+      -> if p < 0 we coerce p to 0, if p > 1 we coerce it to 1.
+      -> then we return rate1 + p * (rate2 - rate1)
+
+  -> Also we need special cases for when the bike is stopped (e.g. below some minimum speed threshold)
+    -> I suppose we'd have a conditional in each function to check the threshold
+
+so our end program would look something like:
+
+#define COLOR_SPEED_MIN  <interpolated>
+#define COLOR_SPEED_MAX  <interpolated>
+#define COLOR_MIN        Color(<interpolated>, <interpolated>, <interpolated>)
+#define COLOR_MAX        Color(<interpolated>, <interpolated>, <interpolated>)
+#define RATE_SPEED_MIN   <interpolated>
+#define RATE_SPEED_MAX   <interpolated>
+#define RATE_MIN         <interpolated>
+#define RATE_MAX         <interpolated>
+
+#define STOPPED          <interpolated>
+#define STOPPED_COLOR    Color(<interpolated>, <interpolated>, <interpolated>)
+#define STOPPED_RATE     <interpolated>
+
+#define RED_RANGE          COLOR_MAX.red - COLOR_MIN.red
+#define GREEN_RANGE        COLOR_MAX.green - COLOR_MIN.green
+#define BLUE_RANGE         COLOR_MAX.blue - COLOR_MIN.blue
+#define RATE_RANGE         RATE_MAX - RATE_MIN
+
+// ....a bunch of other code
+
+Color calculate_color(uint16_t speed)
+{
+  if (speed <= STOPPED)
+    return STOPPED_COLOR;
+
+  float pctg = (speed - COLOR_SPEED_MIN) / float(COLOR_SPEED_MAX - COLOR_SPEED_MIN);
+  if (pctg < 0)
+    pctg = 0;
+  if (p > 1)
+    pctg = 1;
+
+  return Color(
+            COLOR_MIN.red + uint8_t(pctg * RED_RANGE),
+            COLOR_MIN.green + uint8_t(pctg * GREEN_RANGE),
+            COLOR_MIN.blue + uint8_t(pctg * BLUE_RANGE)
+        );
+}
+
+uint16_t calculate_rate(uint16_t speed)
+{
+  if (speed <= STOPPED)
+    return STOPPED_RATE;
+
+  float pctg = (speed - RATE_SPEED_MIN) / float(RATE_SPEED_MAX - RATE_SPEED_MIN);
+  if (pctg < 0)
+    pctg = 0;
+  if (p > 1)
+    pctg = 1;
+
+  return RATE_MIN + uint16_t(pctg * RATE_RANGE);
+}
+
+// ....a bunch of other code
+
+
+
+
+So:
+- Rewrite C++ code to follow this style so it can be easily templatized down the road
+- Figure out how to use electron enough to make a simple app
+- Figure out how to use some kind of front end framework, maybe a combo of react and p5.js
+- first pass should minimally just let you set pure numbers for the config values
+    -> outputs the file that you would upload
+- then start thinking about the user interface
+- or maybe I have this the wrong way around? maybe the interface should come first?
+    -> An animation of a bike. frame is stable, wheels may spin. use p5.js
+    -> shows light strip along bike
+    -> after you set up settings and hit play, it shows what it would do at different speeds (you can speed up or slow down)
+        -> requires parallel simulation implementation in JS
+    -> interface is still just entering numbers
+    -> an upload button
+  -> second pass needs an actual color picker, rate spectrum picker
+
+testing?
