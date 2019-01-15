@@ -9,21 +9,21 @@
 #define STRIP_SIZE   68
 #define PIX_PER_RUN  3
 
-#define COLOR_SPEED_MIN  75
-#define COLOR_SPEED_MAX  1275
+#define COLOR_ROT_TIME_MIN  75
+#define COLOR_ROT_TIME_MAX  1275
 
 #define R_COLOR_MIN      255
 #define G_COLOR_MIN      0
 #define B_COLOR_MIN      0
 #define R_COLOR_MAX      0
 #define G_COLOR_MAX      255
-#define B_COLOR_MAX      100
-#define R_RANGE          abs(R_COLOR_MAX - R_COLOR_MIN)
-#define G_RANGE          abs(G_COLOR_MAX - G_COLOR_MIN)
-#define B_RANGE          abs(B_COLOR_MAX - B_COLOR_MIN)
+#define B_COLOR_MAX      0
+#define R_RANGE          R_COLOR_MAX - R_COLOR_MIN
+#define G_RANGE          G_COLOR_MAX - G_COLOR_MIN
+#define B_RANGE          B_COLOR_MAX - B_COLOR_MIN
 
-#define RATE_SPEED_MIN   51
-#define RATE_SPEED_MAX   2000
+#define RATE_ROT_TIME_MIN   51
+#define RATE_ROT_TIME_MAX   2000
 #define RATE_MIN         10
 #define RATE_MAX         400
 #define RATE_RANGE       RATE_MAX - RATE_MIN
@@ -52,13 +52,13 @@ class PixelThread: public Thread {
       color = strip.Color(255, 0, 0);
     }
 
-    uint32_t calculateColor(long speed) {
+    uint32_t calculateColor(long rotation_time) {
       double pctg;
 
-      if (speed <= STOPPED)
+      if (rotation_time >= STOPPED)
         return strip.Color(R_STOPPED, G_STOPPED, B_STOPPED);
 
-      pctg = (speed - COLOR_SPEED_MIN) / (double) (COLOR_SPEED_MAX - COLOR_SPEED_MIN);
+      pctg = abs(rotation_time - COLOR_ROT_TIME_MAX) / (double) (COLOR_ROT_TIME_MAX - COLOR_ROT_TIME_MIN);
       if (pctg < 0)
         pctg = 0.0;
       if (pctg > 1)
@@ -67,8 +67,8 @@ class PixelThread: public Thread {
       return strip.Color(
           R_COLOR_MIN + (uint8_t) (pctg * R_RANGE),
           G_COLOR_MIN + (uint8_t) (pctg * G_RANGE),
-          B_COLOR_MIN + (uint8_t) (pctg * B_RANGE),
-        )
+          B_COLOR_MIN + (uint8_t) (pctg * B_RANGE)
+        );
     }
 
     uint32_t rateToColor(uint16_t rate) {
@@ -96,7 +96,7 @@ class PixelThread: public Thread {
 class SpeedThread: public Thread {
   public:
     uint16_t rate;
-    long speed;
+    long rotation_time;
 
     long _timeOfLastHit;
     long _timeSinceLastRotation;
@@ -104,7 +104,7 @@ class SpeedThread: public Thread {
 
   SpeedThread() {
     rate = 300;
-    speed = 0;
+    rotation_time = 4000;
     _timeSinceLastRotation = 5000;
     _timeOfLastHit = 0;
     _reset = false;
@@ -124,11 +124,11 @@ class SpeedThread: public Thread {
 
   uint16_t calculateRate() {
     double pctg;
-
-    if (speed <= STOPPED)
+    
+    if (rotation_time >= STOPPED)
       return STOPPED_RATE;
 
-    pctg = (speed - RATE_SPEED_MIN) / (double) (RATE_SPEED_MAX - RATE_SPEED_MIN);
+    pctg = abs(rotation_time - RATE_ROT_TIME_MIN) / (double) (RATE_ROT_TIME_MAX - RATE_ROT_TIME_MIN);
     if (pctg < 0)
       pctg = 0.0;
     if (pctg > 1)
@@ -155,7 +155,7 @@ class SpeedThread: public Thread {
   }
 
   void setRate() {
-    speed = max(_timeSinceLastRotation, millis() - _timeOfLastHit);
+    rotation_time = max(_timeSinceLastRotation, millis() - _timeOfLastHit);
     rate = calculateRate();
   }
 };
@@ -185,7 +185,7 @@ void lightStripCallback() {
     strip.setPixelColor(pt.index-1, 0);
     strip.setPixelColor(n - pt.index, 0);
   }
-  uint32_t c = pt.calculateColor(st.speed);
+  uint32_t c = pt.calculateColor(st.rotation_time);
   for (uint16_t j=pt.index; j<(pt.index + pt.pix_per_run); j++) {
     strip.setPixelColor(j, c);
   }
@@ -204,7 +204,7 @@ void lightStripCallback() {
     pt.index = 0;
   }
   strip.show();
-  
+
   pt.setInterval(st.rate);
 }
 
@@ -213,7 +213,7 @@ void setup() {
   pinMode(SENSOR_PIN, INPUT);
   strip.begin();
   strip.show();
-  
+
   pt.onRun(lightStripCallback);
   pt.setInterval(50);
 
