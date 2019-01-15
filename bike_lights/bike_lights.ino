@@ -1,7 +1,6 @@
 #include <StaticThreadController.h>
 #include <Thread.h>
 #include <ThreadController.h>
-
 #include <Adafruit_NeoPixel.h>
 
 #define PIXEL_PIN    6
@@ -17,23 +16,22 @@
 #define B_COLOR_MIN      0
 #define R_COLOR_MAX      0
 #define G_COLOR_MAX      255
-#define B_COLOR_MAX      0
-#define R_RANGE          R_COLOR_MAX - R_COLOR_MIN
-#define G_RANGE          G_COLOR_MAX - G_COLOR_MIN
-#define B_RANGE          B_COLOR_MAX - B_COLOR_MIN
+#define B_COLOR_MAX      100
+#define R_RANGE          (double) (R_COLOR_MAX - R_COLOR_MIN)
+#define G_RANGE          (double) (G_COLOR_MAX - G_COLOR_MIN)
+#define B_RANGE          (double) (B_COLOR_MAX - B_COLOR_MIN)
 
 #define RATE_ROT_TIME_MIN   51
 #define RATE_ROT_TIME_MAX   2000
 #define RATE_MIN         10
 #define RATE_MAX         400
-#define RATE_RANGE       RATE_MAX - RATE_MIN
+#define RATE_RANGE       (double) (RATE_MAX - RATE_MIN)
 
 #define STOPPED          1275
 #define R_STOPPED        255
 #define G_STOPPED        0
 #define B_STOPPED        0
 #define STOPPED_RATE     400
-
 
 class PixelThread: public Thread {
   public:
