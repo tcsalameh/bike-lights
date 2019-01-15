@@ -22,12 +22,12 @@
 #define B_RANGE          (double) (B_COLOR_MAX - B_COLOR_MIN)
 
 #define RATE_ROT_TIME_MIN   51
-#define RATE_ROT_TIME_MAX   2000
+#define RATE_ROT_TIME_MAX   4000
 #define RATE_MIN         10
 #define RATE_MAX         400
 #define RATE_RANGE       (double) (RATE_MAX - RATE_MIN)
 
-#define STOPPED          1275
+#define STOPPED          2000
 #define R_STOPPED        255
 #define G_STOPPED        0
 #define B_STOPPED        0
