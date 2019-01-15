@@ -68,27 +68,6 @@ class PixelThread: public Thread {
           B_COLOR_MIN + (uint8_t) (pctg * B_RANGE)
         );
     }
-
-    uint32_t rateToColor(uint16_t rate) {
-      // red for low speeds, brighter and bluer/whiter as we go faster
-      // max rate is 200 (lowest), min rate is 10
-      // should spend some time looking at examples, thinking about this
-      if (rate < 15) {
-        rate = 15;
-      }
-      uint8_t r;
-      uint8_t g;
-      uint8_t b;
-      if (rate >= 255) {
-        r = 255;
-        g, b = 0;
-      } else {
-        r = rate;
-        g = 255 - rate;
-        b = (uint8_t) ((r * g) / 75);
-      }
-      return strip.Color(r, g, b);
-    }
 };
 
 class SpeedThread: public Thread {
@@ -122,7 +101,7 @@ class SpeedThread: public Thread {
 
   uint16_t calculateRate() {
     double pctg;
-    
+
     if (rotation_time >= STOPPED)
       return STOPPED_RATE;
 
@@ -133,23 +112,6 @@ class SpeedThread: public Thread {
       pctg = 1.0;
 
     return RATE_MIN + (uint16_t) (pctg * RATE_RANGE);
-  }
-
-  uint16_t timeToRate(long millisecs) {
-    // possibilities:
-    // no conversion (extremely slow)
-    // divide by constant factor - based on rotations typically taking 200 - 1000ish ms,
-    // if we divide by 10 we get 20 - 100 ms wait which seems about right
-    // divide by constant factor with min and max
-    // min shld probs be about 10ms, max should probs be abt 100-200ms
-    long adjusted = (millisecs / 5);
-    if (adjusted < 10) {
-      return 10;
-    }
-    if (adjusted > 400) {
-      return 400;
-    }
-    return (uint16_t) adjusted;
   }
 
   void setRate() {
