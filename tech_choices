@@ -1,0 +1,27 @@
+javascript (typescript) + react + electron:
+  + definitely will work cross-platform
+  + already have experience with typescript
+  - lots of frameworks/tech mushed together
+  - js ecosystem
+
+javascript (typescript) + react-native:
+  + simpler than trying to mix in electron too
+  + already have experience with typescript
+  - no point in this app being on mobile, unless I change hardware to allow wireless upload
+  - js ecosystem
+
+rust:
+  + minimum of framework bloat
+  + better managed ecosystem
+  + fun/interesting language to learn
+  - no experience with rust
+  - multiplatform ability is questionable
+  - multiplatform ability esp. questionable for gui stuff
+
+swift:
+  + minimum of framework bloat
+  + well managed ecosystem
+  + fun/interesting lang to learn
+  - no experience with swift
+  - not cross platform
+  - less widely applicable for later projects
