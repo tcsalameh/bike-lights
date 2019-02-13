@@ -11,7 +11,7 @@ You can see them in action in the short video below!
 
 An LED light strip covers both sides of the bike, going up the downtube (the bottom part of the frame), around the front of the headtube (the front part of the frame above the wheel), and back down the downtube on the other side.
 
-The computer (an Arduino Uno) and battery sit inside a re-purposed water bottle container attached to the seat tube (the middle part of the frame). A hall sensor chip installed on one of the seat stays (the back lower part of the frame) records whenever a magnet attached to one of the spokes comes close. The computer uses this data to measure speed, so it can determine what to display on the light strip.
+The computer (an Arduino Uno) and battery sit inside a re-purposed water bottle container attached to the seat tube (the middle part of the frame). A [Hall sensor chip](https://en.wikipedia.org/wiki/Hall_effect_sensor) installed on one of the seat stays (the back lower part of the frame) records whenever a magnet attached to one of the spokes passes by. The computer uses this data to measure speed, so it can determine what to display on the light strip.
 
 I also wanted to be able to easily detach the whole system from my bike, in about 5 minutes or less. The light strip and sensor cabling can detach from the power/computer container, and the whole system is secured with velcro to the frame. I've been able to take it on and off, and even stick it in a backpack, without too much trouble.
 
@@ -46,7 +46,7 @@ Lastly, I had fun working out different ways to change the lightstrip along colo
 - 1 4AA battery holder (https://www.amazon.com/LAMPVPATH-Battery-Connector-Plastic-Housing/dp/B01MAXT00Q/)
 - 4 rechargable AA batteries. Note: The rechargable part is important! Alkaline batteries will have a higher voltage. 4AA rechargable is ~4.8V, close enough to 5V to power the whole system without issue. 4AA alkaline is ~6V, above the safe voltage for the light strip.
 - 1 toggle switch (https://www.adafruit.com/product/3308)
-- 1 hall sensor chip (https://www.amazon.com/SunFounder-Switch-Sensor-Arduino-Raspberry/dp/B013G5N03O/)
+- 1 Hall sensor chip (https://www.amazon.com/SunFounder-Switch-Sensor-Arduino-Raspberry/dp/B013G5N03O/)
 - 1 spoke magnet (https://www.amazon.com/CatEye-Universal-Wheel-Magnet/dp/B018RZ23AE/)
 - 1 470-ohm resistor
 - 1 large capacitor (I used the 4700uF model found here: https://www.adafruit.com/product/1589)
@@ -64,10 +64,10 @@ Lastly, I had fun working out different ways to change the lightstrip along colo
 ## How to make it
 
 1. I wired up and got the whole system working without trying to put anything other than the light strip on the bike. Only after I was satisfied that the code/hardware actually worked, did I think about how it was going to get attached.
-1. Then, I took the water bottle storage container and drilled 3 holes - one just above where the cage would end for the toggle switch, and two in the bottom of the container (for cables for the light strip and the hall sensor).
+1. Then, I took the water bottle storage container and drilled 3 holes - one just above where the cage would end for the toggle switch, and two in the bottom of the container (for cables for the light strip and the Hall sensor).
 1. Then, I broke out the soldering iron and started with where the 4 wire cables would end: at the light strip and at the sensor.
       - Soldered the 4 wires to power, data, ground, and ground wires from the LED strip. I lost the threaded connector for the cable during this process.
-      - For the other one, cut off one wire and soldered the remaining to power, data, and ground wires of the hall sensor.
+      - For the other one, cut off one wire and soldered the remaining to power, data, and ground wires of the Hall sensor.
 1. Then, I started from the other end and connected the power supply to the toggle switch, and soldered wires going into and out of the switch.
 1. At this point I really wanted to be sure that everything was right, because once I soldered any of the 7 wires from the cables to the Arduino or output of the switch, I wouldn't be able to dissasemble anything without de-soldering most of it.
 1. After making sure, I soldered all the remaining connections, which was a bit tricky since everything was half in the container. Since the power/ground wires going to the Arduino were so close, I put some glue in between them after soldering the wires to the header pins, as insulation.
