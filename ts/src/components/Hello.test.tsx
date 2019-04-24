@@ -35,11 +35,11 @@ it('registers onIncrement at click of + button', () => {
   const hello = enzyme.shallow(<Hello name='Tom' enthusiasmLevel={3} onIncrement={spy} />);
   hello.find(".increment").simulate('click');
   expect(spy.calledOnce).toBe(true);
-}
+});
 
-// it('registers onDecrement at click of - button', () => {
-//   const spy = sinon.spy();
-//   const hello = enzyme.shallow(<Hello name='Tom' enthusiasmLevel={3} onDecrement={spy} />);
-//   hello.find(".decrement").simulate('click');
-//   expect(spy.calledOnce).toBe(true);
-// }
+it('registers onDecrement at click of - button', () => {
+  const spy = sinon.spy();
+  const hello = enzyme.shallow(<Hello name='Tom' enthusiasmLevel={3} onDecrement={spy} />);
+  hello.find(".decrement").simulate('click');
+  expect(spy.calledOnce).toBe(true);
+});
