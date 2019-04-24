@@ -24,7 +24,7 @@ const store = createStore<StoreState,any,any,any>(enthusiasm, {
 
 ReactDOM.render(
   <Provider store={store}>
-    <RGBSelector />
+    <RGBSelector title="R"/>
   </Provider>,
   document.getElementById('root') as HTMLElement
 );

@@ -1,31 +1,69 @@
 import * as React from 'react';
 
-export interface Props {
-  value: 255,
-}
+export interface SelectorProps {
+  title: string;
+};
+
+export interface SelectorState {
+  value: number;
+  error: string;
+};
+
+export interface ErrorProps {
+  message: string;
+};
 
 class RGBSelector extends React.Component {
-  constructor(props: Props) {
+  props: SelectorProps;
+  state: SelectorState;
+
+  constructor(props: SelectorProps) {
     super(props);
     this.state = {
       value: 255,
+      error: "",
     };
-  }
+  };
 
   onChange = (event: any) => {
     let newValue = Number(event.target.value);
     if (isNaN(newValue) || newValue < 1 || newValue > 255) {
-      throw new Error('RGB value must be a number between 1 and 255');
+      this.setState({ error: 'RGB value must be a number between 1 and 255' });
+    } else {
+      this.setState({ error: '' });
     }
 
     this.setState({ value: newValue });
   };
 
   render() {
+    const { title } = this.props;
+    const { error } = this.state;
     return (
-      <input type="text" minLength=1 maxLength=3 size=3 placeholder="255" className="rgb-input" onChange={ (event) => this.props.onChange(event) }></input>
+      <div>
+        <div>{title}</div>
+        <input
+        type="text"
+        placeholder="255"
+        className="rgb-input"
+        onChange={ (event) => this.onChange(event) }>
+        </input>
+        <RGBError message={error} />
+      </div>
     );
   };
+}
+
+class RGBError extends React.Component {
+  props: ErrorProps;
+
+  render() {
+    return (
+      <div className="errorDiv">
+      {this.props.message}
+      </div>
+    );
+  }
 }
 
 export default RGBSelector;

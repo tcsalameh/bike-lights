@@ -2,14 +2,7 @@ import * as React from 'react';
 import * as enzyme from 'enzyme';
 import RGBSelector from './rgb';
 
-it('renders anything at all', () => {
-  const thingy = enzyme.shallow(<div>
-      <h1>Test</h1>
-    </div>);
-  expect(thingy.find('h1').html()).toMatch(/Test/);
-});
-
-const wrapper = enzyme.shallow(<RGBSelector />);
+const wrapper = enzyme.shallow(<RGBSelector title="R"/>);
 let container: any, containerProp: any;
 
 describe("rgb selector - basic", () => {
