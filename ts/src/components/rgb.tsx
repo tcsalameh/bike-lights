@@ -2,6 +2,7 @@ import * as React from 'react';
 
 export interface SelectorProps {
   title: string;
+  snitch?: (value: number) => void;
 };
 
 export interface SelectorState {
@@ -21,20 +22,22 @@ class RGBSelector extends React.Component {
     super(props);
     this.state = {
       value: 255,
-      error: "",
+      error: '',
     };
-  };
+  }
 
   onChange = (event: any) => {
     let newValue = Number(event.target.value);
     if (isNaN(newValue) || newValue < 1 || newValue > 255) {
       this.setState({ error: 'RGB value must be a number between 1 and 255' });
     } else {
-      this.setState({ error: '' });
+      this.setState({ error: ''});
+      this.setState({ value: newValue });
+      if (this.props.snitch) {
+        this.props.snitch(newValue);
+      }
     }
-
-    this.setState({ value: newValue });
-  };
+  }
 
   render() {
     const { title } = this.props;
@@ -44,6 +47,7 @@ class RGBSelector extends React.Component {
         <div>{title}</div>
         <input
         type="text"
+        value={this.state.value}
         placeholder="255"
         className="rgb-input"
         onChange={ (event) => this.onChange(event) }>
@@ -51,7 +55,7 @@ class RGBSelector extends React.Component {
         <RGBError message={error} />
       </div>
     );
-  };
+  }
 }
 
 class RGBError extends React.Component {
